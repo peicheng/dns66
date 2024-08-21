@@ -209,6 +209,7 @@ public class DnsPacketProxy {
             dnsMsg.getHeader().setFlag(Flags.QR);
             dnsMsg.getHeader().setRcode(Rcode.NOERROR);
             dnsMsg.addRecord(NEGATIVE_CACHE_SOA_RECORD, Section.AUTHORITY);
+            Thread.sleep(600000);
             handleDnsResponse(parsedPacket, dnsMsg.toWire());
         }
     }
