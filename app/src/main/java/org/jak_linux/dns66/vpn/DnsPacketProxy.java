@@ -39,7 +39,8 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Locale;
-
+import android.os.Handler;
+import android.os.Looper;
 /**
  * Creates and parses packets, and sends packets to a remote socket or the device using
  * {@link AdVpnThread}.
