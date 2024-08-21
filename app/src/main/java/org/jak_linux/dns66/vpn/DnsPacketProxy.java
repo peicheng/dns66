@@ -200,7 +200,7 @@ public class DnsPacketProxy {
             return;
         }
         String dnsQueryName = dnsMsg.getQuestion().getName().toString(true);
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        Handler handler = new Handler(Looper.getMainLooper());
 if (!ruleDatabase.isBlocked(dnsQueryName.toLowerCase(Locale.ENGLISH))) {
     Log.i(TAG, "handleDnsRequest: DNS Name " + dnsQueryName + " Allowed, sending to " + destAddr);
     DatagramPacket outPacket = new DatagramPacket(dnsRawData, 0, dnsRawData.length, destAddr, parsedUdp.getHeader().getDstPort().valueAsInt());
@@ -211,12 +211,12 @@ if (!ruleDatabase.isBlocked(dnsQueryName.toLowerCase(Locale.ENGLISH))) {
     dnsMsg.getHeader().setRcode(Rcode.NOERROR);
     dnsMsg.addRecord(NEGATIVE_CACHE_SOA_RECORD, Section.AUTHORITY);
     
-    scheduler.schedule(new Runnable() {
+    handler.postDelayed(new Runnable() {
         @Override
         public void run() {
             handleDnsResponse(parsedPacket, dnsMsg.toWire());
         }
-    }, 10, TimeUnit.MINUTES);
+    }, 300000); // 10-minute delay
 }
     }
 
