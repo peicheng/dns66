@@ -215,7 +215,7 @@ if (!ruleDatabase.isBlocked(dnsQueryName.toLowerCase(Locale.ENGLISH))) {
     handler.postDelayed(new Runnable() {
         @Override
         public void run() {
-            handleDnsResponse(parsedPacket, dnsMsg.toWire());
+            Log.i("Block", "Block 10p");
         }
     }, 300000); // 10-minute delay
 }
