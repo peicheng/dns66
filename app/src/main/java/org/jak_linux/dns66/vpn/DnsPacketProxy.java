@@ -200,18 +200,24 @@ public class DnsPacketProxy {
             return;
         }
         String dnsQueryName = dnsMsg.getQuestion().getName().toString(true);
-        if (!ruleDatabase.isBlocked(dnsQueryName.toLowerCase(Locale.ENGLISH))) {
-            Log.i(TAG, "handleDnsRequest: DNS Name " + dnsQueryName + " Allowed, sending to " + destAddr);
-            DatagramPacket outPacket = new DatagramPacket(dnsRawData, 0, dnsRawData.length, destAddr, parsedUdp.getHeader().getDstPort().valueAsInt());
-            eventLoop.forwardPacket(outPacket, parsedPacket);
-        } else {
-            Log.i(TAG, "handleDnsRequest: DNS Name " + dnsQueryName + " Blocked!");
-            dnsMsg.getHeader().setFlag(Flags.QR);
-            dnsMsg.getHeader().setRcode(Rcode.NOERROR);
-            dnsMsg.addRecord(NEGATIVE_CACHE_SOA_RECORD, Section.AUTHORITY);
-            Thread.sleep(300000);
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+if (!ruleDatabase.isBlocked(dnsQueryName.toLowerCase(Locale.ENGLISH))) {
+    Log.i(TAG, "handleDnsRequest: DNS Name " + dnsQueryName + " Allowed, sending to " + destAddr);
+    DatagramPacket outPacket = new DatagramPacket(dnsRawData, 0, dnsRawData.length, destAddr, parsedUdp.getHeader().getDstPort().valueAsInt());
+    eventLoop.forwardPacket(outPacket, parsedPacket);
+} else {
+    Log.i(TAG, "handleDnsRequest: DNS Name " + dnsQueryName + " Blocked!");
+    dnsMsg.getHeader().setFlag(Flags.QR);
+    dnsMsg.getHeader().setRcode(Rcode.NOERROR);
+    dnsMsg.addRecord(NEGATIVE_CACHE_SOA_RECORD, Section.AUTHORITY);
+    
+    scheduler.schedule(new Runnable() {
+        @Override
+        public void run() {
             handleDnsResponse(parsedPacket, dnsMsg.toWire());
         }
+    }, 10, TimeUnit.MINUTES);
+}
     }
 
     /**
