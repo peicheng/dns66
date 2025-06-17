@@ -49,12 +49,17 @@ jobs:
       - name: Build APK
         run: ./gradlew assembleRelease
 
-      - name: Upload APK to GitHub Release
-        uses: ncipollo/release-action@v1
+      - uses: actions/upload-artifact@v4
         with:
-          artifacts: app/build/outputs/apk/release/app-release.apk  # Đường dẫn tới file APK
-          tag: ${{ github.ref_name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          name: Release ${{ github.ref_name }}
-          draft: false
-          prerelease: false
+          name: my-artifact
+          path: '**/*.apk'
+
+      #- name: Upload APK to GitHub Release
+      #  uses: ncipollo/release-action@v1
+      #  with:
+      #    artifacts: app/build/outputs/apk/release/app-release.apk  # Đường dẫn tới file APK
+      #    tag: ${{ github.ref_name }}
+      #   token: ${{ secrets.GITHUB_TOKEN }}
+      #    name: Release ${{ github.ref_name }}
+      #   draft: false
+      #   prerelease: false
